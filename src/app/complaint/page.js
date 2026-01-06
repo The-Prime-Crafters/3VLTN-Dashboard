@@ -124,7 +124,7 @@ export default function ComplaintPage() {
               <ul className="text-gray-300 text-sm space-y-1 list-disc list-inside">
                 <li>Your ticket has been open for more than 48 hours without response</li>
                 <li>The issue is urgent and needs immediate attention</li>
-                <li>You're not satisfied with the current resolution progress</li>
+                <li>You&apos;re not satisfied with the current resolution progress</li>
                 <li>Your messages are not being acknowledged</li>
               </ul>
             </div>

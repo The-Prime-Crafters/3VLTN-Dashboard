@@ -49,9 +49,10 @@ export default function ChatPage() {
   }, [selectedRoom]);
 
   // Scroll to bottom when new messages arrive
+  const currentRoomMessages = selectedRoom ? messages[selectedRoom.id] : null;
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages[selectedRoom?.id]]);
+  }, [currentRoomMessages]);
 
   const loadRoomMessages = async (roomId) => {
     try {
