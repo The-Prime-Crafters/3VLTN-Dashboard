@@ -134,6 +134,12 @@
       "namedRegex": "^/chat(?:/)?$"
     },
     {
+      "page": "/chatbot",
+      "regex": "^/chatbot(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/chatbot(?:/)?$"
+    },
+    {
       "page": "/complaint",
       "regex": "^/complaint(?:/)?$",
       "routeKeys": {},

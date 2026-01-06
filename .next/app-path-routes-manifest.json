@@ -15,6 +15,7 @@
   "/api/users/route": "/api/users",
   "/api/users/stats/route": "/api/users/stats",
   "/chat/page": "/chat",
+  "/chatbot/page": "/chatbot",
   "/complaint/page": "/complaint",
   "/favicon.ico/route": "/favicon.ico",
   "/issues/page": "/issues",

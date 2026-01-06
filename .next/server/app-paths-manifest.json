@@ -15,6 +15,7 @@
   "/api/users/route": "app/api/users/route.js",
   "/api/users/stats/route": "app/api/users/stats/route.js",
   "/chat/page": "app/chat/page.js",
+  "/chatbot/page": "app/chatbot/page.js",
   "/complaint/page": "app/complaint/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
   "/issues/page": "app/issues/page.js",

@@ -12,6 +12,7 @@ const ROUTE_PERMISSIONS = {
   '/plans': ['admin'],
   '/tickets': ['admin', 'developer', 'support'],
   '/chat': ['admin', 'developer', 'support'], // All authenticated users
+  '/chatbot': ['admin'], // Only admin can see chatbot analytics
   '/analytics': ['admin'],
   '/admin-panel': ['admin']
 };
