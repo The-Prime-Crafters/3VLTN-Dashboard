@@ -1,19 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const UserFilters = ({ onFilterChange }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [planFilter, setPlanFilter] = useState('all');
 
-  const handleApplyFilters = () => {
+  const handleApplyFilters = useCallback(() => {
     onFilterChange({
       search: searchTerm,
       status: statusFilter,
       subsTier: planFilter
     });
-  };
+  }, [onFilterChange, searchTerm, statusFilter, planFilter]);
 
   // Auto-apply filters after a delay when typing
   useEffect(() => {
@@ -22,7 +22,7 @@ const UserFilters = ({ onFilterChange }) => {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, statusFilter, planFilter]);
+  }, [handleApplyFilters]);
 
   return (
     <div className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-6">

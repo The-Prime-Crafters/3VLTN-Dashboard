@@ -13,13 +13,9 @@ const Navigation = () => {
   const [loading, setLoading] = useState(true);
   const [navigating, setNavigating] = useState(false);
   
-  // Try to get chat context (may be null if not in ChatProvider)
-  let chatContext = null;
-  try {
-    chatContext = useChat();
-  } catch {
-    // Not in ChatProvider context, that's okay
-  }
+  // Get chat context - Navigation is always wrapped in ChatProvider by ConditionalLayout
+  // So useChat() should always work
+  const chatContext = useChat();
 
   useEffect(() => {
     const timer = setInterval(() => {

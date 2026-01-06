@@ -16,8 +16,29 @@ export default function TicketsPage() {
     page: 1
   });
 
+  async function loadTickets() {
+    setLoading(true);
+    try {
+      const result = await getTickets(filters);
+      console.log('📊 Tickets API Response:', result);
+      console.log('🎫 First Ticket Sample:', result.data?.[0]);
+      console.log('👤 Agent Info Check:', {
+        assigned_agent_name: result.data?.[0]?.assigned_agent_name,
+        assigned_agent_email: result.data?.[0]?.assigned_agent_email,
+        assigned_to: result.data?.[0]?.assigned_to
+      });
+      setTickets(result.data || []);
+      setPagination(result.pagination || { page: 1, pages: 1, total: 0 });
+    } catch (error) {
+      console.error('❌ Error loading tickets:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     loadTickets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   useEffect(() => {

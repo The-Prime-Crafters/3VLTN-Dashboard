@@ -40,20 +40,6 @@ export default function ChatPage() {
       .catch(err => console.error('Error fetching user:', err));
   }, []);
 
-  // Load messages when room is selected
-  useEffect(() => {
-    if (selectedRoom) {
-      loadRoomMessages(selectedRoom.id);
-      markRoomAsRead(selectedRoom.id);
-    }
-  }, [selectedRoom]);
-
-  // Scroll to bottom when new messages arrive
-  const currentRoomMessages = selectedRoom ? messages[selectedRoom.id] : null;
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentRoomMessages]);
-
   const loadRoomMessages = async (roomId) => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_TICKET_API_URL || 'http://localhost:3001';
@@ -67,6 +53,21 @@ export default function ChatPage() {
       console.error('Error loading messages:', error);
     }
   };
+
+  // Load messages when room is selected
+  useEffect(() => {
+    if (selectedRoom) {
+      loadRoomMessages(selectedRoom.id);
+      markRoomAsRead(selectedRoom.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRoom]);
+
+  // Scroll to bottom when new messages arrive
+  const currentRoomMessages = selectedRoom ? messages[selectedRoom.id] : null;
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [currentRoomMessages]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();

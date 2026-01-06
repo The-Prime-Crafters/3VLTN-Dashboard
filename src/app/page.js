@@ -15,7 +15,7 @@ export default function Dashboard() {
               <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
                 Dashboard <span className="gradient-text">Overview</span>
               </h1>
-              <p className="text-gray-400 text-lg">Welcome back! Here's what's happening with your app.</p>
+              <p className="text-gray-400 text-lg">Welcome back! Here&apos;s what&apos;s happening with your app.</p>
             </div>
             <div className="hidden lg:flex items-center space-x-4">
               <div className="text-right">

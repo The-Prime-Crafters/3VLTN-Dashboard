@@ -1,0 +1,64 @@
+(()=>{var a={};a.id=318,a.ids=[318],a.modules={261:a=>{"use strict";a.exports=require("next/dist/shared/lib/router/utils/app-paths")},3295:a=>{"use strict";a.exports=require("next/dist/server/app-render/after-task-async-storage.external.js")},10846:a=>{"use strict";a.exports=require("next/dist/compiled/next-server/app-page.runtime.prod.js")},19121:a=>{"use strict";a.exports=require("next/dist/server/app-render/action-async-storage.external.js")},26346:(a,b,c)=>{"use strict";let{Pool:d}=c(42449),e=new d({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:!1}});e.on("connect",()=>{console.log("Connected to Neon database")}),e.on("error",a=>{console.error("Database connection error:",a)}),a.exports=e},29294:a=>{"use strict";a.exports=require("next/dist/server/app-render/work-async-storage.external.js")},42449:a=>{"use strict";a.exports=require("pg")},44870:a=>{"use strict";a.exports=require("next/dist/compiled/next-server/app-route.runtime.prod.js")},59310:(a,b,c)=>{"use strict";let d=c(26346);a.exports={getUsers:async function(a=10,b=0,c="",e="all",f="all"){let g=`
+    SELECT 
+      id,
+      firebase_uid,
+      email,
+      subs_tier,
+      created_at,
+      updated_at,
+      first_name,
+      last_name,
+      username,
+      is_google_auth,
+      subscription_status,
+      last_payment_date,
+      next_payment_date,
+      phone,
+      company,
+      mailgun_configured
+    FROM users
+    WHERE 1=1
+  `,h=[],i=0;c&&(i++,g+=` AND (email ILIKE $${i} OR first_name ILIKE $${i} OR last_name ILIKE $${i} OR username ILIKE $${i})`,h.push(`%${c}%`)),"all"!==e&&(i++,g+=` AND subscription_status = $${i}`,h.push(e)),"all"!==f&&(i++,g+=` AND subs_tier = $${i}`,h.push(f)),g+=` ORDER BY created_at DESC LIMIT $${i+1} OFFSET $${i+2}`,h.push(a,b);try{return(await d.query(g,h)).rows}catch(a){throw console.error("Error fetching users:",a),a}},getUserStats:async function(){try{let[a,b,c,e,f]=await Promise.all([d.query("SELECT COUNT(*) as total FROM users"),d.query(`
+        SELECT 
+          subs_tier,
+          COUNT(*) as count
+        FROM users 
+        GROUP BY subs_tier
+      `),d.query(`
+        SELECT 
+          subscription_status,
+          COUNT(*) as count
+        FROM users 
+        GROUP BY subscription_status
+      `),d.query(`
+        SELECT COUNT(*) as new_this_month
+        FROM users 
+        WHERE created_at >= DATE_TRUNC('month', CURRENT_DATE)
+      `),d.query(`
+        SELECT COUNT(*) as active_users
+        FROM users 
+        WHERE updated_at >= CURRENT_DATE - INTERVAL '30 days'
+      `)]);return{total:parseInt(a.rows[0].total),byTier:b.rows,byStatus:c.rows,newThisMonth:parseInt(e.rows[0].new_this_month),activeUsers:parseInt(f.rows[0].active_users)}}catch(a){throw console.error("Error fetching user stats:",a),a}},getPlanStats:async function(){try{let[a,b,c]=await Promise.all([d.query(`
+        SELECT 
+          subs_tier,
+          COUNT(*) as user_count,
+          CASE 
+            WHEN subs_tier = 'freemium' THEN 0
+            WHEN subs_tier = 'basic' THEN 9
+            WHEN subs_tier = 'professional' THEN 29
+            WHEN subs_tier = 'enterprise' THEN 99
+            ELSE 0
+          END as monthly_price
+        FROM users 
+        WHERE subscription_status = 'active'
+        GROUP BY subs_tier
+      `),d.query(`
+        SELECT COUNT(*) as active_subscriptions
+        FROM users 
+        WHERE subscription_status = 'active'
+      `),d.query(`
+        SELECT COUNT(*) as churned_users
+        FROM users 
+        WHERE subscription_status = 'inactive' 
+        AND updated_at >= CURRENT_DATE - INTERVAL '30 days'
+      `)]),e=0;a.rows.forEach(a=>{e+=a.user_count*a.monthly_price});let f=parseInt(b.rows[0].active_subscriptions),g=parseInt(c.rows[0].churned_users),h=f>0?(g/f*100).toFixed(1):0,i=f>0?(e/f).toFixed(2):0;return{totalRevenue:e,activeSubscriptions:f,avgRevenuePerUser:parseFloat(i),churnRate:parseFloat(h),byTier:a.rows}}catch(a){throw console.error("Error fetching plan stats:",a),a}},getUserCount:async function(a="",b="all",c="all"){let e="SELECT COUNT(*) as count FROM users WHERE 1=1",f=[],g=0;a&&(g++,e+=` AND (email ILIKE $${g} OR first_name ILIKE $${g} OR last_name ILIKE $${g} OR username ILIKE $${g})`,f.push(`%${a}%`)),"all"!==b&&(g++,e+=` AND subscription_status = $${g}`,f.push(b)),"all"!==c&&(g++,e+=` AND subs_tier = $${g}`,f.push(c));try{let a=await d.query(e,f);return parseInt(a.rows[0].count)}catch(a){throw console.error("Error fetching user count:",a),a}}}},63033:a=>{"use strict";a.exports=require("next/dist/server/app-render/work-unit-async-storage.external.js")},78335:()=>{},81724:(a,b,c)=>{"use strict";c.r(b),c.d(b,{handler:()=>C,patchFetch:()=>B,routeModule:()=>x,serverHooks:()=>A,workAsyncStorage:()=>y,workUnitAsyncStorage:()=>z});var d={};c.r(d),c.d(d,{GET:()=>w});var e=c(95736),f=c(9117),g=c(4044),h=c(39326),i=c(32324),j=c(261),k=c(54290),l=c(85328),m=c(38928),n=c(46595),o=c(3421),p=c(17679),q=c(41681),r=c(63446),s=c(86439),t=c(51356),u=c(10641),v=c(59310);async function w(a){try{let{searchParams:b}=new URL(a.url),c=parseInt(b.get("page"))||1,d=parseInt(b.get("limit"))||10,e=b.get("search")||"",f=b.get("status")||"all",g=b.get("subsTier")||"all",h=(c-1)*d,[i,j]=await Promise.all([(0,v.getUsers)(d,h,e,f,g),(0,v.getUserCount)(e,f,g)]);return u.NextResponse.json({users:i,pagination:{page:c,limit:d,total:j,pages:Math.ceil(j/d)}})}catch(a){return console.error("Error fetching users:",a),u.NextResponse.json({error:"Failed to fetch users"},{status:500})}}let x=new e.AppRouteRouteModule({definition:{kind:f.RouteKind.APP_ROUTE,page:"/api/users/route",pathname:"/api/users",filename:"route",bundlePath:"app/api/users/route"},distDir:".next",relativeProjectDir:"",resolvedPagePath:"C:\\Users\\erpai\\3VLTN\\3VLTN-Dashboard\\src\\app\\api\\users\\route.js",nextConfigOutput:"",userland:d}),{workAsyncStorage:y,workUnitAsyncStorage:z,serverHooks:A}=x;function B(){return(0,g.patchFetch)({workAsyncStorage:y,workUnitAsyncStorage:z})}async function C(a,b,c){var d;let e="/api/users/route";"/index"===e&&(e="/");let g=await x.prepare(a,b,{srcPage:e,multiZoneDraftMode:!1});if(!g)return b.statusCode=400,b.end("Bad Request"),null==c.waitUntil||c.waitUntil.call(c,Promise.resolve()),null;let{buildId:u,params:v,nextConfig:w,isDraftMode:y,prerenderManifest:z,routerServerContext:A,isOnDemandRevalidate:B,revalidateOnlyGenerated:C,resolvedPathname:D}=g,E=(0,j.normalizeAppPath)(e),F=!!(z.dynamicRoutes[E]||z.routes[D]);if(F&&!y){let a=!!z.routes[D],b=z.dynamicRoutes[E];if(b&&!1===b.fallback&&!a)throw new s.NoFallbackError}let G=null;!F||x.isDev||y||(G="/index"===(G=D)?"/":G);let H=!0===x.isDev||!F,I=F&&!H,J=a.method||"GET",K=(0,i.getTracer)(),L=K.getActiveScopeSpan(),M={params:v,prerenderManifest:z,renderOpts:{experimental:{cacheComponents:!!w.experimental.cacheComponents,authInterrupts:!!w.experimental.authInterrupts},supportsDynamicResponse:H,incrementalCache:(0,h.getRequestMeta)(a,"incrementalCache"),cacheLifeProfiles:null==(d=w.experimental)?void 0:d.cacheLife,isRevalidate:I,waitUntil:c.waitUntil,onClose:a=>{b.on("close",a)},onAfterTaskError:void 0,onInstrumentationRequestError:(b,c,d)=>x.onRequestError(a,b,d,A)},sharedContext:{buildId:u}},N=new k.NodeNextRequest(a),O=new k.NodeNextResponse(b),P=l.NextRequestAdapter.fromNodeNextRequest(N,(0,l.signalFromNodeResponse)(b));try{let d=async c=>x.handle(P,M).finally(()=>{if(!c)return;c.setAttributes({"http.status_code":b.statusCode,"next.rsc":!1});let d=K.getRootSpanAttributes();if(!d)return;if(d.get("next.span_type")!==m.BaseServerSpan.handleRequest)return void console.warn(`Unexpected root span type '${d.get("next.span_type")}'. Please report this Next.js issue https://github.com/vercel/next.js`);let e=d.get("next.route");if(e){let a=`${J} ${e}`;c.setAttributes({"next.route":e,"http.route":e,"next.span_name":a}),c.updateName(a)}else c.updateName(`${J} ${a.url}`)}),g=async g=>{var i,j;let k=async({previousCacheEntry:f})=>{try{if(!(0,h.getRequestMeta)(a,"minimalMode")&&B&&C&&!f)return b.statusCode=404,b.setHeader("x-nextjs-cache","REVALIDATED"),b.end("This page could not be found"),null;let e=await d(g);a.fetchMetrics=M.renderOpts.fetchMetrics;let i=M.renderOpts.pendingWaitUntil;i&&c.waitUntil&&(c.waitUntil(i),i=void 0);let j=M.renderOpts.collectedTags;if(!F)return await (0,o.I)(N,O,e,M.renderOpts.pendingWaitUntil),null;{let a=await e.blob(),b=(0,p.toNodeOutgoingHttpHeaders)(e.headers);j&&(b[r.NEXT_CACHE_TAGS_HEADER]=j),!b["content-type"]&&a.type&&(b["content-type"]=a.type);let c=void 0!==M.renderOpts.collectedRevalidate&&!(M.renderOpts.collectedRevalidate>=r.INFINITE_CACHE)&&M.renderOpts.collectedRevalidate,d=void 0===M.renderOpts.collectedExpire||M.renderOpts.collectedExpire>=r.INFINITE_CACHE?void 0:M.renderOpts.collectedExpire;return{value:{kind:t.CachedRouteKind.APP_ROUTE,status:e.status,body:Buffer.from(await a.arrayBuffer()),headers:b},cacheControl:{revalidate:c,expire:d}}}}catch(b){throw(null==f?void 0:f.isStale)&&await x.onRequestError(a,b,{routerKind:"App Router",routePath:e,routeType:"route",revalidateReason:(0,n.c)({isRevalidate:I,isOnDemandRevalidate:B})},A),b}},l=await x.handleResponse({req:a,nextConfig:w,cacheKey:G,routeKind:f.RouteKind.APP_ROUTE,isFallback:!1,prerenderManifest:z,isRoutePPREnabled:!1,isOnDemandRevalidate:B,revalidateOnlyGenerated:C,responseGenerator:k,waitUntil:c.waitUntil});if(!F)return null;if((null==l||null==(i=l.value)?void 0:i.kind)!==t.CachedRouteKind.APP_ROUTE)throw Object.defineProperty(Error(`Invariant: app-route received invalid cache entry ${null==l||null==(j=l.value)?void 0:j.kind}`),"__NEXT_ERROR_CODE",{value:"E701",enumerable:!1,configurable:!0});(0,h.getRequestMeta)(a,"minimalMode")||b.setHeader("x-nextjs-cache",B?"REVALIDATED":l.isMiss?"MISS":l.isStale?"STALE":"HIT"),y&&b.setHeader("Cache-Control","private, no-cache, no-store, max-age=0, must-revalidate");let m=(0,p.fromNodeOutgoingHttpHeaders)(l.value.headers);return(0,h.getRequestMeta)(a,"minimalMode")&&F||m.delete(r.NEXT_CACHE_TAGS_HEADER),!l.cacheControl||b.getHeader("Cache-Control")||m.get("Cache-Control")||m.set("Cache-Control",(0,q.getCacheControlHeader)(l.cacheControl)),await (0,o.I)(N,O,new Response(l.value.body,{headers:m,status:l.value.status||200})),null};L?await g(L):await K.withPropagatedContext(a.headers,()=>K.trace(m.BaseServerSpan.handleRequest,{spanName:`${J} ${a.url}`,kind:i.SpanKind.SERVER,attributes:{"http.method":J,"http.target":a.url}},g))}catch(b){if(b instanceof s.NoFallbackError||await x.onRequestError(a,b,{routerKind:"App Router",routePath:E,routeType:"route",revalidateReason:(0,n.c)({isRevalidate:I,isOnDemandRevalidate:B})}),F)throw b;return await (0,o.I)(N,O,new Response(null,{status:500})),null}}},86439:a=>{"use strict";a.exports=require("next/dist/shared/lib/no-fallback-error.external")},96487:()=>{}};var b=require("../../../webpack-runtime.js");b.C(a);var c=b.X(0,[586,692],()=>b(b.s=81724));module.exports=c})();

@@ -18,7 +18,7 @@ export default function AnalyticsPage() {
               <h1 className="text-4xl font-bold text-white tracking-tight">Analytics <span className="gradient-text">Dashboard</span></h1>
             </div>
           </div>
-          <p className="text-gray-400 text-lg ml-15">Track your app's performance and user behavior</p>
+          <p className="text-gray-400 text-lg ml-15">Track your app&apos;s performance and user behavior</p>
         </div>
       </div>
 

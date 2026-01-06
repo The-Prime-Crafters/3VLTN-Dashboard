@@ -17,10 +17,6 @@ export default function TicketDetailPage({ params }) {
   const [replyMessage, setReplyMessage] = useState('');
   const [sending, setSending] = useState(false);
 
-  useEffect(() => {
-    loadTicket();
-  }, [ticketId]);
-
   async function loadTicket() {
     setLoading(true);
     try {
@@ -32,6 +28,11 @@ export default function TicketDetailPage({ params }) {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    loadTicket();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticketId]);
 
   async function handleStatusChange(newStatus) {
     setUpdating(true);

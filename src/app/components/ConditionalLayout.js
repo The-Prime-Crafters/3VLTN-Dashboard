@@ -21,7 +21,8 @@ export default function ConditionalLayout({ children }) {
 
   // Fetch current user for chat (only once)
   useEffect(() => {
-    if (!publicRoutes.some(route => pathname.startsWith(route)) && !user) {
+    const isPublic = publicRoutes.some(route => pathname.startsWith(route));
+    if (!isPublic && !user) {
       fetch('/api/auth/me')
         .then(res => res.json())
         .then(data => {
@@ -31,7 +32,8 @@ export default function ConditionalLayout({ children }) {
         })
         .catch(err => console.error('Error fetching user:', err));
     }
-  }, []); // Empty dependency array - only run once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   // Show navigation loading state
   useEffect(() => {
