@@ -1,0 +1,35 @@
+Hi Backend Team!
+
+I need to implement automatic ticket assignment with round-robin algorithm.
+
+📖 READ THIS FIRST:
+👉 ROUND_ROBIN_TICKET_ASSIGNMENT_PROMPT.md (Complete implementation guide with code examples)
+
+📊 FOR REFERENCE:
+👉 DASHBOARD_USERS_TABLE_REFERENCE.md (Database structure and queries)
+
+SUMMARY OF WHAT'S NEEDED:
+
+1. DATABASE CHANGES:
+   - Add `assigned_to` column to tickets table
+   - Create `ticket_assignment_tracker` table
+   - Add assignment statistics to dashboard_users
+
+2. IMPLEMENT:
+   - Round-robin assignment algorithm
+   - Auto-assign tickets on creation
+   - Email notification to assigned agent
+   - API endpoints for manual reassignment
+
+3. LOGIC:
+   - Get eligible users (support + developer roles, approved, active)
+   - Rotate through users in order
+   - Update assignment tracker
+   - Notify agent via email
+
+ESTIMATED TIME: 4-6 hours
+
+Everything you need is in the ROUND_ROBIN_TICKET_ASSIGNMENT_PROMPT.md file!
+
+Let me know if you have questions!
+

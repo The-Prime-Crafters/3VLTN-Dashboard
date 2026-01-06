@@ -1,0 +1,16 @@
+{
+  "/api/auth/login/route": "app/api/auth/login/route.js",
+  "/api/auth/me/route": "app/api/auth/me/route.js",
+  "/api/users/stats/route": "app/api/users/stats/route.js",
+  "/api/plans/stats/route": "app/api/plans/stats/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/analytics/stats/route": "app/api/analytics/stats/route.js",
+  "/api/admin/pending/route": "app/api/admin/pending/route.js",
+  "/api/admin/users/route": "app/api/admin/users/route.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
+  "/plans/page": "app/plans/page.js",
+  "/tickets/page": "app/tickets/page.js",
+  "/analytics/page": "app/analytics/page.js",
+  "/admin-panel/page": "app/admin-panel/page.js"
+}

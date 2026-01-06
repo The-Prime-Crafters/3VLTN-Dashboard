@@ -1,0 +1,22 @@
+Hi! I need you to add two public API endpoints to our ticket system.
+
+Please read and implement everything in this file:
+👉 BACKEND_PROMPT.md
+
+For detailed specifications, also check:
+👉 CUSTOMER_PORTAL_BACKEND.md
+
+Summary:
+- Create GET /api/public/ticket/:ticketId (for status lookup)
+- Create POST /api/public/complaint (for escalation complaints)
+- Add new 'complaints' database table
+- Implement rate limiting
+- Send emails to admin and customer
+- Add security measures
+
+The frontend is already done and waiting for these APIs.
+
+Estimated time: 3-5 hours
+
+Let me know if you have questions!
+
