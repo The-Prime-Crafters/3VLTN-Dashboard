@@ -55,6 +55,7 @@ const Navigation = () => {
     { name: 'Tickets', href: '/tickets', icon: '🎫', roles: ['admin', 'developer', 'support'] },
     { name: 'Chat', href: '/chat', icon: '💬', roles: ['admin', 'developer', 'support'] },
     { name: 'Chatbot', href: '/chatbot', icon: '🤖', roles: ['admin'] },
+    { name: 'Verifications', href: '/verifications', icon: '✅', roles: ['admin'] },
     { name: 'Analytics', href: '/analytics', icon: '📈', roles: ['admin'] },
     { name: 'Admin Panel', href: '/admin-panel', icon: '👑', roles: ['admin'] },
   ];

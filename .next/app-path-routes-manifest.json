@@ -26,5 +26,7 @@
   "/tickets/[ticketId]/page": "/tickets/[ticketId]",
   "/tickets/page": "/tickets",
   "/track/page": "/track",
-  "/users/page": "/users"
+  "/users/page": "/users",
+  "/verifications/[transactionId]/page": "/verifications/[transactionId]",
+  "/verifications/page": "/verifications"
 }

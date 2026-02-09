@@ -13,6 +13,7 @@ const ROUTE_PERMISSIONS = {
   '/tickets': ['admin', 'developer', 'support'],
   '/chat': ['admin', 'developer', 'support'], // All authenticated users
   '/chatbot': ['admin'], // Only admin can see chatbot analytics
+  '/verifications': ['admin'], // Only admin can see verifications
   '/analytics': ['admin'],
   '/admin-panel': ['admin']
 };
@@ -49,8 +50,13 @@ export async function middleware(request) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    // Check route permissions
-    const allowedRoles = ROUTE_PERMISSIONS[pathname];
+    // Check route permissions (handle dynamic routes)
+    let routeToCheck = pathname;
+    if (pathname.startsWith('/verifications/')) {
+      routeToCheck = '/verifications';
+    }
+    
+    const allowedRoles = ROUTE_PERMISSIONS[routeToCheck];
     
     if (allowedRoles && !allowedRoles.includes(payload.role)) {
       // Redirect to appropriate page based on role

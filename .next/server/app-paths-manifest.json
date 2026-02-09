@@ -26,5 +26,7 @@
   "/tickets/[ticketId]/page": "app/tickets/[ticketId]/page.js",
   "/tickets/page": "app/tickets/page.js",
   "/track/page": "app/track/page.js",
-  "/users/page": "app/users/page.js"
+  "/users/page": "app/users/page.js",
+  "/verifications/[transactionId]/page": "app/verifications/[transactionId]/page.js",
+  "/verifications/page": "app/verifications/page.js"
 }

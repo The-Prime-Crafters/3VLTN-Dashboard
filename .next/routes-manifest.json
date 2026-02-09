@@ -28,6 +28,14 @@
         "nxtPticketId": "nxtPticketId"
       },
       "namedRegex": "^/tickets/(?<nxtPticketId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/verifications/[transactionId]",
+      "regex": "^/verifications/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPtransactionId": "nxtPtransactionId"
+      },
+      "namedRegex": "^/verifications/(?<nxtPtransactionId>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [
@@ -192,6 +200,12 @@
       "regex": "^/users(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/users(?:/)?$"
+    },
+    {
+      "page": "/verifications",
+      "regex": "^/verifications(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/verifications(?:/)?$"
     }
   ],
   "dataRoutes": [],
