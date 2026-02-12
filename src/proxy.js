@@ -25,7 +25,7 @@ const DEFAULT_ROUTES = {
   'support': '/tickets'
 };
 
-export async function middleware(request) {
+export async function proxy(request) {
   const { pathname } = request.nextUrl;
 
   // Allow public routes
