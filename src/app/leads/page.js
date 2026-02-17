@@ -20,7 +20,7 @@ export default function LeadsPage() {
         try {
             const res = await fetch('http://localhost:8000/api/social-leads', {
                 headers: {
-                    'X-User-Id': '1', // Ensure this matches your auth requirements
+                    'X-User-Id': '69', // Ensure this matches your auth requirements
                     'Content-Type': 'application/json'
                 }
             });
@@ -48,7 +48,7 @@ export default function LeadsPage() {
             const res = await fetch(`http://localhost:8000/api/social-leads/run/${platform}`, {
                 method: 'POST',
                 headers: {
-                    'X-User-Id': '1'
+                    'X-User-Id': '69'
                 }
             });
             const data = await res.json();
