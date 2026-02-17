@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useChat } from '@/context/ChatContext';
+import { Share2 } from 'lucide';
 
 const Navigation = () => {
   const pathname = usePathname();
@@ -12,7 +13,7 @@ const Navigation = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [navigating, setNavigating] = useState(false);
-  
+
   // Get chat context - Navigation is always wrapped in ChatProvider by ConditionalLayout
   // So useChat() should always work
   const chatContext = useChat();
@@ -58,10 +59,11 @@ const Navigation = () => {
     { name: 'Verifications', href: '/verifications', icon: '✅', roles: ['admin'] },
     { name: 'Analytics', href: '/analytics', icon: '📈', roles: ['admin'] },
     { name: 'Admin Panel', href: '/admin-panel', icon: '👑', roles: ['admin'] },
+    { name: 'Social Leads', href: '/leads', icon: Share2, roles: ['admin', 'developer', 'support'] },
   ];
 
   // Filter nav items based on user role
-  const navItems = user 
+  const navItems = user
     ? allNavItems.filter(item => item.roles.includes(user.role))
     : allNavItems;
 
@@ -79,7 +81,7 @@ const Navigation = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Navigation Items */}
       <div className="space-y-1 mb-8">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 mb-3">
@@ -89,7 +91,7 @@ const Navigation = () => {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const unreadCount = item.href === '/chat' && chatContext?.unreadCount ? chatContext.unreadCount : 0;
-            
+
             return (
               <li key={item.name}>
                 <Link
@@ -101,11 +103,10 @@ const Navigation = () => {
                       setTimeout(() => setNavigating(false), 500);
                     }
                   }}
-                  className={`flex items-center space-x-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden ${
-                    isActive
-                      ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-semibold shadow-lg shadow-yellow-400/30'
-                      : 'text-gray-300 hover:bg-gray-800/60 hover:text-white'
-                  }`}
+                  className={`flex items-center space-x-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden ${isActive
+                    ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-semibold shadow-lg shadow-yellow-400/30'
+                    : 'text-gray-300 hover:bg-gray-800/60 hover:text-white'
+                    }`}
                 >
                   {isActive && (
                     <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-yellow-400 opacity-0 group-hover:opacity-20 transition-opacity duration-200" />
@@ -127,7 +128,7 @@ const Navigation = () => {
           })}
         </ul>
       </div>
-      
+
       {/* User Info & Status Section */}
       <div className="mt-auto space-y-4">
         {/* User Profile */}
@@ -146,11 +147,10 @@ const Navigation = () => {
                 </div>
               </div>
               <div className="flex items-center justify-between mb-3">
-                <span className={`px-2 py-1 rounded-lg text-xs font-bold ${
-                  user.role === 'admin' ? 'bg-purple-500/20 text-purple-400' :
+                <span className={`px-2 py-1 rounded-lg text-xs font-bold ${user.role === 'admin' ? 'bg-purple-500/20 text-purple-400' :
                   user.role === 'developer' ? 'bg-blue-500/20 text-blue-400' :
-                  'bg-green-500/20 text-green-400'
-                }`}>
+                    'bg-green-500/20 text-green-400'
+                  }`}>
                   {user.role.toUpperCase()}
                 </span>
               </div>
