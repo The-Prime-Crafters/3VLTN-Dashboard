@@ -1,5 +1,5 @@
 'use client';
-import { Disc, Facebook, Share2, Twitter } from 'lucide-react';
+import { Disc, Facebook, Share2, Twitter, Loader2 } from 'lucide-react'; // Import Loader2
 import { useEffect, useState } from 'react';
 import LeadsFilters from '../components/LeadsFilters';
 import LeadsTable from '../components/LeadsTable';
@@ -7,7 +7,6 @@ import LeadsTable from '../components/LeadsTable';
 export default function LeadsPage() {
     const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(true);
-    // Initialize as null to distinguish between "loading" and "empty user"
     const [currentUser, setCurrentUser] = useState(null);
     const [filters, setFilters] = useState({
         search: '',
@@ -15,6 +14,9 @@ export default function LeadsPage() {
         intent: 'all',
         score: 'all'
     });
+
+    // New state to track which platform is currently scraping
+    const [scrapingPlatform, setScrapingPlatform] = useState(null);
 
     // 1. Fetch User on Mount
     useEffect(() => {
@@ -28,9 +30,8 @@ export default function LeadsPage() {
             .catch(err => console.error('Error fetching user:', err));
     }, []);
 
-    // 2. Fetch Leads ONLY when currentUser.id is available
+    // 2. Fetch Leads
     const fetchLeads = async () => {
-        // Guard clause: Don't run if we don't have a user ID yet
         if (!currentUser?.id) return;
 
         setLoading(true);
@@ -39,8 +40,8 @@ export default function LeadsPage() {
         try {
             const res = await fetch('http://localhost:8000/api/social-leads', {
                 headers: {
-                    'X-User-Id': currentUser.id, // Dynamically use the ID
-                    'X-User-Role': currentUser.role || "user", // Dynamically use the Role
+                    'X-User-Id': currentUser.id,
+                    'X-User-Role': currentUser.role || "user",
                     'Content-Type': 'application/json'
                 }
             });
@@ -56,12 +57,11 @@ export default function LeadsPage() {
         }
     };
 
-    // 3. Trigger fetchLeads whenever currentUser changes
     useEffect(() => {
         if (currentUser?.id) {
             fetchLeads();
         }
-    }, [currentUser]); // This is the key fix: Wait for currentUser to populate
+    }, [currentUser]);
 
     // Run Scraper Button Handler
     const runScraper = async (platform) => {
@@ -72,22 +72,28 @@ export default function LeadsPage() {
 
         if (!confirm(`Start scraping ${platform}? This may take a minute.`)) return;
 
+        // Set scraping state
+        setScrapingPlatform(platform);
+
         try {
             const res = await fetch(`http://localhost:8000/api/social-leads/run/${platform}`, {
                 method: 'POST',
                 headers: {
-                    'X-User-Id': currentUser.id // Updated from '69' to dynamic ID
+                    'X-User-Id': currentUser.id,
+                    'X-User-Role': currentUser.role || 'user'
                 }
             });
             const data = await res.json();
             alert(data.message || "Scraping started!");
-            fetchLeads(); // Refresh list after triggering
+            fetchLeads();
         } catch (e) {
             alert("Failed to start scraper");
+        } finally {
+            // Reset scraping state regardless of success/failure
+            setScrapingPlatform(null);
         }
     };
 
-    // Client-side filtering logic
     const filteredLeads = leads.filter(lead => {
         const matchesSearch = filters.search === '' ||
             lead.content.toLowerCase().includes(filters.search.toLowerCase()) ||
@@ -100,23 +106,17 @@ export default function LeadsPage() {
         return matchesSearch && matchesPlatform && matchesIntent && matchesScore;
     });
 
-    // Optional: Show a loading state for the entire page if user isn't loaded yet
     if (!currentUser) {
         return <div className="p-10 text-center text-gray-500">Loading user profile...</div>;
     }
 
     return (
         <div className="space-y-8">
-            {/* Header Section with Dashboard Theme */}
+            {/* Header Section */}
             <div className="relative">
-                {/* Glow Effect */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-3xl blur-xl"></div>
-
-                {/* Glassmorphism Container */}
                 <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-900/50 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-8">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-
-                        {/* Title & Subtitle */}
                         <div>
                             <h1 className="text-4xl font-bold text-white mb-2 tracking-tight flex items-center gap-3">
                                 <Share2 className="w-10 h-10 text-blue-500" />
@@ -125,53 +125,79 @@ export default function LeadsPage() {
                             <p className="text-gray-400 text-lg">Real-time leads from Reddit, Facebook, and X.</p>
                         </div>
 
-                        {/* Scraper Action Buttons */}
                         <div className="flex flex-wrap gap-3">
+                            {/* REDDIT BUTTON */}
                             <button
                                 onClick={() => runScraper('reddit')}
-                                className="cursor-pointer group relative inline-flex items-center gap-2 px-5 py-2.5 bg-gray-800 hover:bg-orange-600 border border-gray-700 hover:border-orange-500 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-orange-500/20"
+                                disabled={scrapingPlatform !== null} // Disable if ANY scrape is running
+                                className={`cursor-pointer group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 shadow-lg ${scrapingPlatform === 'reddit'
+                                        ? 'bg-orange-600/80 border-orange-500 cursor-not-allowed'
+                                        : 'bg-gray-800 hover:bg-orange-600 border border-gray-700 hover:border-orange-500 hover:shadow-orange-500/20'
+                                    } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
-                                <Disc className="w-4 h-4 text-orange-500 group-hover:text-white transition-colors" />
-                                <span className="font-medium">Run Reddit</span>
+                                {scrapingPlatform === 'reddit' ? (
+                                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                                ) : (
+                                    <Disc className="w-4 h-4 text-orange-500 group-hover:text-white transition-colors" />
+                                )}
+                                <span className="font-medium">
+                                    {scrapingPlatform === 'reddit' ? 'Scraping...' : 'Run Reddit'}
+                                </span>
                             </button>
 
+                            {/* FACEBOOK BUTTON */}
                             <button
                                 onClick={() => runScraper('facebook')}
-                                className="cursor-pointer group relative inline-flex items-center gap-2 px-5 py-2.5 bg-gray-800 hover:bg-blue-600 border border-gray-700 hover:border-blue-500 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-blue-500/20"
+                                disabled={scrapingPlatform !== null}
+                                className={`cursor-pointer group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 shadow-lg ${scrapingPlatform === 'facebook'
+                                        ? 'bg-blue-600/80 border-blue-500 cursor-not-allowed'
+                                        : 'bg-gray-800 hover:bg-blue-600 border border-gray-700 hover:border-blue-500 hover:shadow-blue-500/20'
+                                    } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
-                                <Facebook className="w-4 h-4 text-blue-500 group-hover:text-white transition-colors" />
-                                <span className="font-medium">Run FB</span>
+                                {scrapingPlatform === 'facebook' ? (
+                                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                                ) : (
+                                    <Facebook className="w-4 h-4 text-blue-500 group-hover:text-white transition-colors" />
+                                )}
+                                <span className="font-medium">
+                                    {scrapingPlatform === 'facebook' ? 'Scraping...' : 'Run FB'}
+                                </span>
                             </button>
 
+                            {/* TWITTER BUTTON */}
                             <button
                                 onClick={() => runScraper('twitter')}
-                                className="cursor-pointer group relative inline-flex items-center gap-2 px-5 py-2.5 bg-gray-800 hover:bg-black border border-gray-700 hover:border-gray-500 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-gray-500/20"
+                                disabled={scrapingPlatform !== null}
+                                className={`cursor-pointer group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 shadow-lg ${scrapingPlatform === 'twitter'
+                                        ? 'bg-gray-900 border-gray-500 cursor-not-allowed'
+                                        : 'bg-gray-800 hover:bg-black border border-gray-700 hover:border-gray-500 hover:shadow-gray-500/20'
+                                    } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
-                                <Twitter className="w-4 h-4 text-sky-500 group-hover:text-white transition-colors" />
-                                <span className="font-medium">Run X</span>
+                                {scrapingPlatform === 'twitter' ? (
+                                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                                ) : (
+                                    <Twitter className="w-4 h-4 text-sky-500 group-hover:text-white transition-colors" />
+                                )}
+                                <span className="font-medium">
+                                    {scrapingPlatform === 'twitter' ? 'Scraping...' : 'Run X'}
+                                </span>
                             </button>
                         </div>
-
                     </div>
                 </div>
             </div>
 
-            {/* Main Content Area */}
+            {/* Content Area */}
             <div className="grid grid-cols-1 gap-8">
-
-                {/* Filters Section */}
                 <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-6">
                     <LeadsFilters filters={filters} setFilters={setFilters} />
                 </div>
-
-                {/* Table Section */}
                 <div className="relative">
                     <div className="absolute -inset-1 bg-gradient-to-r from-gray-800/20 to-gray-700/20 rounded-3xl blur-xl"></div>
                     <div className="relative bg-gray-900/50 backdrop-blur-sm border border-gray-800/50 rounded-2xl overflow-hidden">
                         <LeadsTable leads={filteredLeads} loading={loading} />
                     </div>
                 </div>
-
             </div>
         </div>
     );
