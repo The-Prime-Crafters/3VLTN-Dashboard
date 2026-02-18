@@ -59,7 +59,7 @@ const Navigation = () => {
     { name: 'Verifications', href: '/verifications', icon: '✅', roles: ['admin'] },
     { name: 'Analytics', href: '/analytics', icon: '📈', roles: ['admin'] },
     { name: 'Admin Panel', href: '/admin-panel', icon: '👑', roles: ['admin'] },
-    { name: 'Social Leads', href: '/leads', icon: "", roles: ['admin', 'developer', 'support'] },
+    { name: 'Social Leads', href: '/leads', icon: "🌐", roles: ['admin', 'developer', 'support'] },
   ];
 
   // Filter nav items based on user role
