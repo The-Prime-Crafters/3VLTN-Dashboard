@@ -1,7 +1,6 @@
-import StatsCard from './components/StatsCard';
-import RecentActivity from './components/RecentActivity';
-import QuickActions from './components/QuickActions';
 import DashboardStats from './components/DashboardStats';
+import QuickActions from './components/QuickActions';
+import RecentActivity from './components/RecentActivity';
 
 export default function Dashboard() {
   return (
