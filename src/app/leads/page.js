@@ -1,12 +1,14 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { Disc, Facebook, Share2, Twitter } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import LeadsFilters from '../components/LeadsFilters';
 import LeadsTable from '../components/LeadsTable';
-import { Share2, RefreshCw, Facebook, Twitter, Disc } from 'lucide-react';
 
 export default function LeadsPage() {
     const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(true);
+    // Initialize as null to distinguish between "loading" and "empty user"
+    const [currentUser, setCurrentUser] = useState(null);
     const [filters, setFilters] = useState({
         search: '',
         platform: 'all',
@@ -14,13 +16,31 @@ export default function LeadsPage() {
         score: 'all'
     });
 
-    // Fetch Leads from your Backend
+    // 1. Fetch User on Mount
+    useEffect(() => {
+        fetch('/api/auth/me')
+            .then(res => res.json())
+            .then(data => {
+                if (data.user) {
+                    setCurrentUser(data.user);
+                }
+            })
+            .catch(err => console.error('Error fetching user:', err));
+    }, []);
+
+    // 2. Fetch Leads ONLY when currentUser.id is available
     const fetchLeads = async () => {
+        // Guard clause: Don't run if we don't have a user ID yet
+        if (!currentUser?.id) return;
+
         setLoading(true);
+        console.log("Fetching leads for user:", currentUser.id, "Role:", currentUser.role);
+
         try {
             const res = await fetch('http://localhost:8000/api/social-leads', {
                 headers: {
-                    'X-User-Id': '69', // Ensure this matches your auth requirements
+                    'X-User-Id': currentUser.id, // Dynamically use the ID
+                    'X-User-Role': currentUser.role || "user", // Dynamically use the Role
                     'Content-Type': 'application/json'
                 }
             });
@@ -36,19 +56,27 @@ export default function LeadsPage() {
         }
     };
 
+    // 3. Trigger fetchLeads whenever currentUser changes
     useEffect(() => {
-        fetchLeads();
-    }, []);
+        if (currentUser?.id) {
+            fetchLeads();
+        }
+    }, [currentUser]); // This is the key fix: Wait for currentUser to populate
 
     // Run Scraper Button Handler
     const runScraper = async (platform) => {
+        if (!currentUser?.id) {
+            alert("User not authenticated");
+            return;
+        }
+
         if (!confirm(`Start scraping ${platform}? This may take a minute.`)) return;
 
         try {
             const res = await fetch(`http://localhost:8000/api/social-leads/run/${platform}`, {
                 method: 'POST',
                 headers: {
-                    'X-User-Id': '69'
+                    'X-User-Id': currentUser.id // Updated from '69' to dynamic ID
                 }
             });
             const data = await res.json();
@@ -71,6 +99,11 @@ export default function LeadsPage() {
 
         return matchesSearch && matchesPlatform && matchesIntent && matchesScore;
     });
+
+    // Optional: Show a loading state for the entire page if user isn't loaded yet
+    if (!currentUser) {
+        return <div className="p-10 text-center text-gray-500">Loading user profile...</div>;
+    }
 
     return (
         <div className="space-y-8">
