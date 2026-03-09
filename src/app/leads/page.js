@@ -1,5 +1,5 @@
 'use client';
-import { Disc, Facebook, Share2, Twitter, Loader2, X } from 'lucide-react';
+import { Disc, Facebook, Share2, Twitter, Loader2, X, Download } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import LeadsFilters from '../components/LeadsFilters';
 import LeadsTable from '../components/LeadsTable';
@@ -27,6 +27,8 @@ export default function LeadsPage() {
     });
 
     const [scrapingPlatform, setScrapingPlatform] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     // 1. Fetch User
     useEffect(() => {
@@ -118,14 +120,57 @@ export default function LeadsPage() {
 
     // Filtering Logic
     const filteredLeads = leads.filter(lead => {
+        const content = lead?.content?.toLowerCase?.() || '';
+        const authorName = lead?.author_name?.toLowerCase?.() || '';
+
         const matchesSearch = filters.search === '' ||
-            lead.content.toLowerCase().includes(filters.search.toLowerCase()) ||
-            lead.author_name.toLowerCase().includes(filters.search.toLowerCase());
+            content.includes(filters.search.toLowerCase()) ||
+            authorName.includes(filters.search.toLowerCase());
         const matchesPlatform = filters.platform === 'all' || lead.platform === filters.platform;
         const matchesIntent = filters.intent === 'all' || lead.intent === filters.intent;
         const matchesScore = filters.score === 'all' || lead.score === filters.score;
         return matchesSearch && matchesPlatform && matchesIntent && matchesScore;
     });
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filters.search, filters.platform, filters.intent, filters.score, rowsPerPage]);
+
+    const totalPages = Math.max(1, Math.ceil(filteredLeads.length / rowsPerPage));
+    const safeCurrentPage = Math.min(currentPage, totalPages);
+    const startIndex = (safeCurrentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
+
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [currentPage, totalPages]);
+
+    const escapeCsvField = (value) => {
+        const safeValue = value ?? '';
+        const stringValue = String(safeValue);
+        return `"${stringValue.replace(/"/g, '""')}"`;
+    };
+
+    const exportFilteredLeadsAsCsv = () => {
+        if (!filteredLeads.length) return;
+
+        const headers = ['id', 'platform', 'author_name', 'intent', 'score', 'context', 'content', 'url'];
+        const rows = filteredLeads.map((lead) => headers.map((header) => escapeCsvField(lead?.[header])).join(','));
+        const csvContent = [headers.join(','), ...rows].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const fileUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = `social-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(fileUrl);
+    };
 
     if (!currentUser) return <div className="p-10 text-center text-gray-500">Loading user profile...</div>;
 
@@ -189,7 +234,55 @@ export default function LeadsPage() {
                     <LeadsFilters filters={filters} setFilters={setFilters} />
                 </div>
                 <div className="relative bg-gray-900/50 backdrop-blur-sm border border-gray-800/50 rounded-2xl overflow-hidden">
-                    <LeadsTable leads={filteredLeads} loading={loading} />
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-6 py-4 border-b border-gray-800/60 bg-gray-900/40">
+                        <div className="text-sm text-gray-400">
+                            Showing {filteredLeads.length === 0 ? 0 : startIndex + 1}-{Math.min(endIndex, filteredLeads.length)} of {filteredLeads.length} leads
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-3">
+                            <select
+                                value={rowsPerPage}
+                                onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                                className="px-3 py-2 bg-gray-900/60 border border-gray-700 text-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/40"
+                            >
+                                <option value={10}>10 per page</option>
+                                <option value={20}>20 per page</option>
+                            </select>
+
+                            <button
+                                onClick={exportFilteredLeadsAsCsv}
+                                disabled={filteredLeads.length === 0}
+                                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <Download className="w-4 h-4" />
+                                Export CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <LeadsTable leads={paginatedLeads} loading={loading} />
+
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-800/60 bg-gray-900/40">
+                        <button
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={safeCurrentPage === 1}
+                            className="px-3 py-1.5 rounded-lg text-sm bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Previous
+                        </button>
+
+                        <span className="text-sm text-gray-400">
+                            Page {safeCurrentPage} of {totalPages}
+                        </span>
+
+                        <button
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={safeCurrentPage === totalPages}
+                            className="px-3 py-1.5 rounded-lg text-sm bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
             </div>
 
