@@ -43,7 +43,7 @@ export default function LeadsPage() {
         if (!currentUser?.id) return;
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:8000/api/social-leads', {
+            const res = await fetch('https://api.3vltn.com/api/social-leads', {
                 headers: {
                     'X-User-Id': currentUser.id,
                     'X-User-Role': currentUser.role || "user",
@@ -94,7 +94,7 @@ export default function LeadsPage() {
         setScrapingPlatform(platformToRun); // Show loader on button
 
         try {
-            const res = await fetch(`http://localhost:8000/api/social-leads/run/${platformToRun}`, {
+            const res = await fetch(`https://api.3vltn.com/api/social-leads/run/${platformToRun}`, {
                 method: 'POST',
                 headers: {
                     'X-User-Id': currentUser.id,
