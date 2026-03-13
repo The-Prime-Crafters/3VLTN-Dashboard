@@ -3,8 +3,11 @@ import { Disc, Facebook, Share2, Twitter, Loader2, X, Download } from 'lucide-re
 import { useEffect, useState } from 'react';
 import LeadsFilters from '../components/LeadsFilters';
 import LeadsTable from '../components/LeadsTable';
+import UserDomainLookup from '../components/UserDomainLookup';
+import FoundersClubChallengePanel from '../components/FoundersClubChallengePanel';
 
 export default function LeadsPage() {
+    const [activeTab, setActiveTab] = useState('social');
     const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
@@ -176,9 +179,39 @@ export default function LeadsPage() {
 
     return (
         <div className="space-y-8 relative">
+            <div className="flex flex-wrap gap-2">
+                <button
+                    onClick={() => setActiveTab('social')}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${activeTab === 'social'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                        }`}
+                >
+                    Social Leads
+                </button>
+                <button
+                    onClick={() => setActiveTab('domains')}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${activeTab === 'domains'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                        }`}
+                >
+                    User Domains
+                </button>
+                <button
+                    onClick={() => setActiveTab('founders')}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${activeTab === 'founders'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                        }`}
+                >
+                    Founders Club Challenge
+                </button>
+            </div>
 
             {/* Header Section */}
-            <div className="relative">
+            {activeTab === 'social' && (
+                <div className="relative">
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-3xl blur-xl"></div>
                 <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-900/50 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-8">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
@@ -227,9 +260,11 @@ export default function LeadsPage() {
                     </div>
                 </div>
             </div>
+            )}
 
             {/* Content Area */}
-            <div className="grid grid-cols-1 gap-8">
+            {activeTab === 'social' && (
+                <div className="grid grid-cols-1 gap-8">
                 <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-6">
                     <LeadsFilters filters={filters} setFilters={setFilters} />
                 </div>
@@ -285,9 +320,14 @@ export default function LeadsPage() {
                     </div>
                 </div>
             </div>
+            )}
+
+            {activeTab === 'domains' && <UserDomainLookup />}
+
+            {activeTab === 'founders' && <FoundersClubChallengePanel />}
 
             {/* --- CONFIGURATION MODAL --- */}
-            {modalOpen && (
+            {activeTab === 'social' && modalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
 
