@@ -17,36 +17,35 @@ async function resolveAdminKey(request) {
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const email = searchParams.get('email');
+  const status = searchParams.get('status') || 'pending';
+  const limit = searchParams.get('limit') || '200';
   const adminKey = await resolveAdminKey(request);
 
   if (!adminKey) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
-  if (!email) {
-    return NextResponse.json({ success: false, error: 'email query param is required' }, { status: 400 });
-  }
-
   try {
-    const upstream = await fetch(`${BACKEND_API_BASE}/api/founders-club/admin/challenge-status?email=${encodeURIComponent(email)}`, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'x-admin-key': adminKey
-      },
-      cache: 'no-store'
-    });
+    const upstream = await fetch(
+      `${BACKEND_API_BASE}/api/founders-club/admin/challenges?status=${encodeURIComponent(status)}&limit=${encodeURIComponent(limit)}`,
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'x-admin-key': adminKey
+        },
+        cache: 'no-store'
+      }
+    );
 
     const payload = await upstream.json().catch(() => null);
 
     return NextResponse.json(
-      payload || { success: false, error: 'Failed to fetch challenge status.' },
+      payload || { success: false, error: 'Failed to fetch challenge list.' },
       { status: upstream.status }
     );
   } catch (error) {
-    console.error('Admin challenge-status proxy error:', error);
-    return NextResponse.json({ success: false, error: 'Failed to fetch challenge status.' }, { status: 500 });
+    console.error('Admin challenges proxy error:', error);
+    return NextResponse.json({ success: false, error: 'Failed to fetch challenge list.' }, { status: 500 });
   }
 }
-

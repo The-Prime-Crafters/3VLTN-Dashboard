@@ -1,9 +1,22 @@
 import { NextResponse } from 'next/server';
+import { getSession } from '@/lib/session';
 
 const BACKEND_API_BASE = 'https://3vltn.com';
 
+async function resolveAdminKey(request) {
+  const headerKey = request.headers.get('x-admin-key') || '';
+  if (headerKey) return headerKey;
+
+  const session = await getSession();
+  if (session?.role === 'admin' && process.env.ADMIN_API_KEY) {
+    return process.env.ADMIN_API_KEY;
+  }
+
+  return '';
+}
+
 export async function POST(request) {
-  const adminKey = request.headers.get('x-admin-key') || '';
+  const adminKey = await resolveAdminKey(request);
 
   if (!adminKey) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
