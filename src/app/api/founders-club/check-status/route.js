@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BACKEND_API_BASE = process.env.BACKEND_API_URL || 'https://api.3vltn.com';
+const BACKEND_API_BASE = 'https://3vltn.com';
 
 export async function POST(request) {
   try {
@@ -27,3 +27,4 @@ export async function POST(request) {
     return NextResponse.json({ success: false, error: 'Failed to check status.' }, { status: 500 });
   }
 }
+

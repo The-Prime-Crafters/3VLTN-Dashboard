@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BACKEND_API_BASE = process.env.BACKEND_API_URL || 'https://api.3vltn.com';
+const BACKEND_API_BASE = 'https://3vltn.com';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -36,3 +36,4 @@ export async function GET(request) {
     return NextResponse.json({ success: false, error: 'Failed to fetch challenge status.' }, { status: 500 });
   }
 }
+
