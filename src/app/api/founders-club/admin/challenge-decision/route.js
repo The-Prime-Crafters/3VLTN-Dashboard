@@ -3,35 +3,31 @@ import { getSession } from '@/lib/session';
 
 const BACKEND_API_BASE = 'https://3vltn.com';
 
-async function resolveAdminKey(request) {
-  const headerKey = request.headers.get('x-admin-key') || '';
-  if (headerKey) return headerKey;
-
+async function isAdminSession() {
   const session = await getSession();
-  if (session?.role === 'admin' && process.env.ADMIN_API_KEY) {
-    return process.env.ADMIN_API_KEY;
-  }
-
-  return '';
+  return session?.role === 'admin';
 }
 
 export async function POST(request) {
-  const adminKey = await resolveAdminKey(request);
+  const isAdmin = await isAdminSession();
 
-  if (!adminKey) {
-    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  if (!isAdmin) {
+    return NextResponse.json({ success: false, error: 'Forbidden: admin access required' }, { status: 403 });
   }
 
   try {
     const body = await request.json();
+    const headers = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    };
+    if (process.env.ADMIN_API_KEY) {
+      headers['x-admin-key'] = process.env.ADMIN_API_KEY;
+    }
 
     const upstream = await fetch(`${BACKEND_API_BASE}/api/founders-club/admin/challenge-decision`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'x-admin-key': adminKey
-      },
+      headers,
       body: JSON.stringify(body),
       cache: 'no-store'
     });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import UserTable from '../components/UserTable';
 import UserStats from '../components/UserStats';
 import UserFilters from '../components/UserFilters';
@@ -12,9 +12,19 @@ export default function UsersPage() {
     subsTier: 'all'
   });
 
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
-  };
+  const handleFilterChange = useCallback((newFilters) => {
+    setFilters((prev) => {
+      if (
+        prev.search === newFilters.search &&
+        prev.status === newFilters.status &&
+        prev.subsTier === newFilters.subsTier
+      ) {
+        return prev;
+      }
+
+      return newFilters;
+    });
+  }, []);
 
   return (
     <div className="space-y-8">

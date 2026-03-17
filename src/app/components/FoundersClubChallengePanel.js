@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 const STATUS_TABS = ['pending', 'approved', 'rejected', 'all'];
@@ -16,18 +16,12 @@ export default function FoundersClubChallengePanel() {
   const [submitMessage, setSubmitMessage] = useState('');
   const [submitError, setSubmitError] = useState('');
 
-  const [adminKeyOverride, setAdminKeyOverride] = useState('');
   const [queueStatus, setQueueStatus] = useState('pending');
   const [queueLoading, setQueueLoading] = useState(false);
   const [queueError, setQueueError] = useState('');
   const [queue, setQueue] = useState([]);
   const [queueCounts, setQueueCounts] = useState(null);
   const [actioningEmail, setActioningEmail] = useState('');
-
-  const adminHeaders = useMemo(() => {
-    if (!adminKeyOverride.trim()) return {};
-    return { 'x-admin-key': adminKeyOverride.trim() };
-  }, [adminKeyOverride]);
 
   const checkStatus = async () => {
     const normalizedEmail = email.trim();
@@ -101,7 +95,7 @@ export default function FoundersClubChallengePanel() {
     try {
       const res = await fetch(
         `/api/founders-club/admin/challenges?status=${encodeURIComponent(status)}&limit=200`,
-        { headers: adminHeaders }
+        { headers: {} }
       );
       const data = await res.json();
 
@@ -130,8 +124,7 @@ export default function FoundersClubChallengePanel() {
       const res = await fetch('/api/founders-club/admin/challenge-decision', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          ...adminHeaders
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           email: targetEmail,
@@ -230,18 +223,7 @@ export default function FoundersClubChallengePanel() {
 
         <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-6 space-y-4">
           <h3 className="text-lg font-semibold text-white">Admin Challenge Queue</h3>
-          <p className="text-sm text-gray-400">If you are logged in as admin and `ADMIN_API_KEY` is set on server, key is auto-applied.</p>
-
-          <div>
-            <label className="text-sm text-gray-300 block mb-1.5">Admin API Key Override (optional)</label>
-            <input
-              type="password"
-              value={adminKeyOverride}
-              onChange={(e) => setAdminKeyOverride(e.target.value)}
-              placeholder="Leave empty to use admin session auto-auth"
-              className="w-full px-4 py-2.5 rounded-xl bg-gray-900/60 border border-gray-700 text-gray-100 outline-none focus:ring-2 focus:ring-blue-500/40"
-            />
-          </div>
+          <p className="text-sm text-gray-400">Admin actions are now gated by dashboard session role only.</p>
 
           <div className="flex flex-wrap gap-2">
             {STATUS_TABS.map((status) => {

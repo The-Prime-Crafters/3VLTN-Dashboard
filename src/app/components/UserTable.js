@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 
-const UserTable = ({ filters: initialFilters }) => {
+const UserTable = ({ filters }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
-  const [filters, setFilters] = useState(initialFilters || {
+  const activeFilters = filters || {
     search: '',
     status: 'all',
     subsTier: 'all'
-  });
+  };
 
   const fetchUsers = async (page = 1, search = '', status = 'all', subsTier = 'all') => {
     try {
@@ -37,24 +37,11 @@ const UserTable = ({ filters: initialFilters }) => {
   };
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  // Watch for filter changes from parent
-  useEffect(() => {
-    if (initialFilters) {
-      setFilters(initialFilters);
-      fetchUsers(1, initialFilters.search, initialFilters.status, initialFilters.subsTier);
-    }
-  }, [initialFilters]);
-
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
-    fetchUsers(1, newFilters.search, newFilters.status, newFilters.subsTier);
-  };
+    fetchUsers(1, activeFilters.search, activeFilters.status, activeFilters.subsTier);
+  }, [activeFilters.search, activeFilters.status, activeFilters.subsTier]);
 
   const handlePageChange = (newPage) => {
-    fetchUsers(newPage, filters.search, filters.status, filters.subsTier);
+    fetchUsers(newPage, activeFilters.search, activeFilters.status, activeFilters.subsTier);
   };
 
   const getStatusColor = (status) => {
