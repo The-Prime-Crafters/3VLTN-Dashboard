@@ -2,6 +2,7 @@ import AnalyticsChart from '../components/AnalyticsChart';
 import AnalyticsStats from '../components/AnalyticsStats';
 import TopUsers from '../components/TopUsers';
 import UserDistributionChart from '../components/UserDistributionChart';
+import LandingVisitStats from '../components/LandingVisitStats';
 
 export default function AnalyticsPage() {
   return (
@@ -24,6 +25,9 @@ export default function AnalyticsPage() {
 
       {/* Analytics Statistics */}
       <AnalyticsStats />
+
+      {/* Landing Page Visits */}
+      <LandingVisitStats />
 
       {/* Charts and Data */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
