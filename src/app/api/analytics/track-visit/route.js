@@ -48,10 +48,21 @@ export async function POST(request) {
       [page, sessionId, utmSource, utmMedium, utmCampaign, ip, userAgent]
     );
 
-    return NextResponse.json({ success: true });
+    const res = NextResponse.json({ success: true });
+    res.headers.set('Access-Control-Allow-Origin', '*');
+    res.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+    return res;
   } catch (error) {
     console.error('Error tracking visit:', error);
     return NextResponse.json({ success: false, error: 'Failed to track visit' }, { status: 500 });
   }
+}
+
+export async function OPTIONS() {
+  const res = new NextResponse(null, { status: 204 });
+  res.headers.set('Access-Control-Allow-Origin', '*');
+  res.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+  res.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  return res;
 }
 
