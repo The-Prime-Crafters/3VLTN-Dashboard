@@ -262,7 +262,7 @@ export default function LeadsPage() {
             </div>
             )}
 
-            {/* Content Area */}
+            {/* Content Area */} 
             {activeTab === 'social' && (
                 <div className="grid grid-cols-1 gap-8">
                 <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-6">
